@@ -13,11 +13,22 @@ class SDLocalization():
         belief_sum = sum(self.belief)
         for i in range(0, len(self.belief)):
             self.belief[i] = self.belief[i] / belief_sum
+        print(self.belief)
 
-    def move(self):
-        pass
+    def move(self, motion):
+        q = []
+        for i in range(0, len(self.belief)):
+            s = self.belief[i - motion % len(self.belief)] * self.motion_sensor[1]
+            s += self.belief[i - motion % len(self.belief) - 1] * self.motion_sensor[0]
+            s += self.belief[i - motion % len(self.belief) + 1] * self.motion_sensor[2]
+            q.append(s)
+        self.belief = q
 
-if __name__ == "main":
+    def combined_motion(self, measurement, motion):
+        self.sense(measurement)
+        self.move(motion)
+
+if __name__ == "__main__":
     p=[0.2, 0.2, 0.2, 0.2, 0.2]
     world=['green', 'red', 'red', 'green', 'green']
     measurements = ['red', 'green']
@@ -28,3 +39,7 @@ if __name__ == "main":
     pOvershoot = 0.1
     pUndershoot = 0.1
     local = SDLocalization(world, p, [pHit, pMiss], [pUndershoot, pExact, pOvershoot])
+    for i,j in zip(measurements, motions):
+        print(i, j)
+        local.combined_motion(i,j)
+    print(local.belief)
